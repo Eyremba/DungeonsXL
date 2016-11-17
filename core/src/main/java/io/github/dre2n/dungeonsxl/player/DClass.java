@@ -19,11 +19,15 @@ package io.github.dre2n.dungeonsxl.player;
 import io.github.dre2n.caliburn.item.UniversalItemStack;
 import io.github.dre2n.commons.compatibility.CompatibilityHandler;
 import io.github.dre2n.commons.compatibility.Version;
+import io.github.dre2n.commons.util.messageutil.MessageUtil;
 import io.github.dre2n.dungeonsxl.DungeonsXL;
+import io.github.dre2n.dungeonsxl.config.DMessages;
 import io.github.dre2n.dungeonsxl.util.DeserializationUtil;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +44,7 @@ public class DClass {
 
     private String name;
 
-    private List<ItemStack> items = new ArrayList<>();
+    private Set<ItemStack> items = new HashSet<>();
     private boolean dog;
 
     public DClass(File file) {
@@ -50,20 +54,35 @@ public class DClass {
     public DClass(String name, FileConfiguration config) {
         this.name = name;
 
-        if (config.contains("items")) {
-            if (Version.andHigher(Version.MC1_9).contains(compat.getVersion())) {
-                items = UniversalItemStack.deserializeList(config.getList("items"));
-            } else {
-                items = DeserializationUtil.deserializeStackList(config.getStringList("items"));
-            }
-        }
+        try {
+            // Use a Set to avoid null values
+            if (config.contains("items")) {
+                List<ItemStack> list = new ArrayList<>();
+                if (Version.andHigher(Version.MC1_9).contains(compat.getVersion())) {
+                    list = UniversalItemStack.deserializeList(config.getList("items"));
+                } else {
+                    list = DeserializationUtil.deserializeStackList(config.getStringList("items"));
+                }
 
-        if (config.contains("dog")) {
-            dog = config.getBoolean("dog");
+                for (ItemStack item : list) {
+                    if (item == null) {
+                        MessageUtil.log(plugin, DMessages.LOG_ERROR_BAD_CONFIG.getMessage(name + ".yml", "Skipping erroneous item..."));
+                    } else {
+                        items.add(item);
+                    }
+                }
+            }
+
+            if (config.contains("dog")) {
+                dog = config.getBoolean("dog");
+            }
+
+        } catch (Exception exception) {
+            MessageUtil.log(plugin, DMessages.LOG_ERROR_BAD_CONFIG.getMessage(name + ".yml", ""));
         }
     }
 
-    public DClass(String name, List<ItemStack> items, boolean dog) {
+    public DClass(String name, Set<ItemStack> items, boolean dog) {
         this.items = items;
         this.name = name;
         this.dog = dog;
@@ -79,7 +98,7 @@ public class DClass {
     /**
      * @return the items
      */
-    public List<ItemStack> getItems() {
+    public Set<ItemStack> getItems() {
         return items;
     }
 

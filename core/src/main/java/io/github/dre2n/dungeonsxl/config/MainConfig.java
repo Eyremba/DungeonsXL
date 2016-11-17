@@ -21,6 +21,7 @@ import io.github.dre2n.commons.compatibility.Internals;
 import io.github.dre2n.commons.config.BRConfig;
 import io.github.dre2n.commons.util.EnumUtil;
 import io.github.dre2n.commons.util.messageutil.MessageUtil;
+import io.github.dre2n.dungeonsxl.DungeonsXL;
 import io.github.dre2n.dungeonsxl.util.DColor;
 import static io.github.dre2n.dungeonsxl.util.DColor.*;
 import java.io.File;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
@@ -37,6 +39,8 @@ import org.bukkit.configuration.ConfigurationSection;
  * @author Frank Baumann, Milan Albrecht, Daniel Saukel
  */
 public class MainConfig extends BRConfig {
+
+    DungeonsXL plugin;
 
     public enum BackupMode {
         ON_DISABLE,
@@ -99,8 +103,9 @@ public class MainConfig extends BRConfig {
     /* Default Dungeon Settings */
     private WorldConfig defaultWorldConfig;
 
-    public MainConfig(File file) {
+    public MainConfig(DungeonsXL plugin, File file) {
         super(file, CONFIG_VERSION);
+        this.plugin = plugin;
 
         if (initialize) {
             initialize();
@@ -480,104 +485,109 @@ public class MainConfig extends BRConfig {
 
     @Override
     public void load() {
-        /* Main Config */
-        if (config.contains("language")) {
-            language = config.getString("language");
-        }
+        try {
+            if (config.contains("language")) {
+                language = config.getString("language");
+            }
 
-        if (config.contains("enableEconomy")) {
-            enableEconomy = config.getBoolean("enableEconomy");
-        }
+            if (config.contains("enableEconomy")) {
+                enableEconomy = config.getBoolean("enableEconomy");
+            }
 
-        if (config.contains("tutorial.activated")) {
-            tutorialActivated = config.getBoolean("tutorial.activated");
-        }
+            if (config.contains("tutorial.activated")) {
+                tutorialActivated = config.getBoolean("tutorial.activated");
+            }
 
-        if (config.contains("tutorial.dungeon")) {
-            tutorialDungeon = config.getString("tutorial.dungeon");
-        }
+            if (config.contains("tutorial.dungeon")) {
+                tutorialDungeon = config.getString("tutorial.dungeon");
+            }
 
-        if (config.contains("tutorial.startgroup")) {
-            tutorialStartGroup = config.getString("tutorial.startgroup");
-        }
+            if (config.contains("tutorial.startgroup")) {
+                tutorialStartGroup = config.getString("tutorial.startgroup");
+            }
 
-        if (config.contains("tutorial.endgroup")) {
-            tutorialEndGroup = config.getString("tutorial.endgroup");
-        }
+            if (config.contains("tutorial.endgroup")) {
+                tutorialEndGroup = config.getString("tutorial.endgroup");
+            }
 
-        if (config.contains("groupColorPriority")) {
-            groupColorPriority.clear();
-            for (String color : config.getStringList("groupColorPriority")) {
-                if (EnumUtil.isValidEnum(DColor.class, color)) {
-                    groupColorPriority.add(DColor.valueOf(color));
+            if (config.contains("groupColorPriority")) {
+                groupColorPriority.clear();
+                for (String color : config.getStringList("groupColorPriority")) {
+                    if (EnumUtil.isValidEnum(DColor.class, color)) {
+                        groupColorPriority.add(DColor.valueOf(color));
+                    }
                 }
             }
-        }
 
-        if (config.contains("announcementInterval")) {
-            announcementInterval = config.getDouble("announcementInterval");
-        }
-
-        if (config.contains("sendFloorTitle")) {
-            sendFloorTitle = config.getBoolean("sendFloorTitle");
-        }
-
-        if (config.contains("externalMobProviders")) {
-            externalMobProviders = config.getConfigurationSection("externalMobProviders").getValues(false);
-        }
-
-        if (config.contains("resourcePacks")) {
-            resourcePacks = config.getConfigurationSection("resourcePacks").getValues(false);
-        }
-
-        if (config.contains("maxInstances")) {
-            maxInstances = config.getInt("maxInstances");
-        }
-
-        if (config.contains("tweaksEnabled")) {
-            if (Internals.andHigher(Internals.v1_9_R1).contains(CompatibilityHandler.getInstance().getInternals())) {
-                tweaksEnabled = config.getBoolean("tweaksEnabled");
-            } else {
-                tweaksEnabled = false;
-                MessageUtil.log(DMessages.LOG_DISABLED_TWEAKS.getMessage());
+            if (config.contains("announcementInterval")) {
+                announcementInterval = config.getDouble("announcementInterval");
             }
-        }
 
-        if (config.contains("secureMode.enabled")) {
-            secureModeEnabled = config.getBoolean("secureMode.enabled");
-        }
-
-        if (config.contains("secureMode.openInventories")) {
-            openInventories = config.getBoolean("secureMode.openInventories");
-        }
-
-        if (config.contains("secureMode.dropItems")) {
-            dropItems = config.getBoolean("secureMode.dropItems");
-        }
-
-        if (config.contains("secureMode.checkInterval")) {
-            secureModeCheckInterval = config.getDouble("secureMode.checkInterval");
-        }
-
-        if (config.contains("secureMode.editCommandWhitelist")) {
-            editCommandWhitelist = config.getStringList("secureMode.editCommandWhitelist");
-        }
-
-        if (config.contains("backupMode")) {
-            String mode = config.getString("backupMode");
-            if (EnumUtil.isValidEnum(BackupMode.class, mode)) {
-                backupMode = BackupMode.valueOf(mode);
+            if (config.contains("sendFloorTitle")) {
+                sendFloorTitle = config.getBoolean("sendFloorTitle");
             }
-        }
 
-        if (config.contains("editPermissions")) {
-            editPermissions = config.getStringList("editPermissions");
-        }
+            if (config.contains("externalMobProviders")) {
+                externalMobProviders = config.getConfigurationSection("externalMobProviders").getValues(false);
+            }
 
-        /* Default Dungeon Config */
-        ConfigurationSection configSection = config.getConfigurationSection("default");
-        if (configSection != null) {
-            defaultWorldConfig = new WorldConfig(configSection);
+            if (config.contains("resourcePacks")) {
+                resourcePacks = config.getConfigurationSection("resourcePacks").getValues(false);
+            }
+
+            if (config.contains("maxInstances")) {
+                maxInstances = config.getInt("maxInstances");
+            }
+
+            if (config.contains("tweaksEnabled")) {
+                if (Internals.andHigher(Internals.v1_9_R1).contains(CompatibilityHandler.getInstance().getInternals())) {
+                    tweaksEnabled = config.getBoolean("tweaksEnabled");
+                } else {
+                    tweaksEnabled = false;
+                    MessageUtil.log(DMessages.LOG_DISABLED_TWEAKS.getMessage());
+                }
+            }
+
+            if (config.contains("secureMode.enabled")) {
+                secureModeEnabled = config.getBoolean("secureMode.enabled");
+            }
+
+            if (config.contains("secureMode.openInventories")) {
+                openInventories = config.getBoolean("secureMode.openInventories");
+            }
+
+            if (config.contains("secureMode.dropItems")) {
+                dropItems = config.getBoolean("secureMode.dropItems");
+            }
+
+            if (config.contains("secureMode.checkInterval")) {
+                secureModeCheckInterval = config.getDouble("secureMode.checkInterval");
+            }
+
+            if (config.contains("secureMode.editCommandWhitelist")) {
+                editCommandWhitelist = config.getStringList("secureMode.editCommandWhitelist");
+            }
+
+            if (config.contains("backupMode")) {
+                String mode = config.getString("backupMode");
+                if (EnumUtil.isValidEnum(BackupMode.class, mode)) {
+                    backupMode = BackupMode.valueOf(mode);
+                }
+            }
+
+            if (config.contains("editPermissions")) {
+                editPermissions = config.getStringList("editPermissions");
+            }
+
+            /* Default Dungeon Config */
+            ConfigurationSection configSection = config.getConfigurationSection("default");
+            if (configSection != null) {
+                defaultWorldConfig = new WorldConfig(configSection);
+            }
+
+        } catch (Exception exception) {
+            MessageUtil.log(plugin, DMessages.LOG_ERROR_BAD_CONFIG.getMessage(file.getName(), "Disabling DungeonsXL..."));
+            Bukkit.getPluginManager().disablePlugin(plugin);
         }
     }
 

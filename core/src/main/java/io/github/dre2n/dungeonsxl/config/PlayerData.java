@@ -326,37 +326,44 @@ public class PlayerData extends BRConfig {
 
     @Override
     public void load() {
-        if (config.isConfigurationSection(PREFIX_STATS + "timeLastPlayed")) {
-            for (String key : config.getConfigurationSection(PREFIX_STATS + "timeLastPlayed").getKeys(false)) {
-                timeLastPlayed.put(key, config.getLong(PREFIX_STATS + "timeLastPlayed." + key));
+        try {
+            if (config.isConfigurationSection(PREFIX_STATS + "timeLastPlayed")) {
+                for (String key : config.getConfigurationSection(PREFIX_STATS + "timeLastPlayed").getKeys(false)) {
+                    timeLastPlayed.put(key, config.getLong(PREFIX_STATS + "timeLastPlayed." + key));
+                }
             }
-        }
 
-        if (!wasInGame()) {
-            return;
-        }
+            if (!wasInGame()) {
+                return;
+            }
 
-        oldInventory = (List<ItemStack>) config.get(PREFIX_STATE_PERSISTENCE + "oldInventory");
-        oldArmor = (List<ItemStack>) config.get(PREFIX_STATE_PERSISTENCE + "oldArmor");
-        oldOffHand = (ItemStack) config.get(PREFIX_STATE_PERSISTENCE + "oldOffHand");
+            oldInventory = (List<ItemStack>) config.get(PREFIX_STATE_PERSISTENCE + "oldInventory");
+            oldArmor = (List<ItemStack>) config.get(PREFIX_STATE_PERSISTENCE + "oldArmor");
+            oldOffHand = (ItemStack) config.get(PREFIX_STATE_PERSISTENCE + "oldOffHand");
 
-        oldLvl = config.getInt(PREFIX_STATE_PERSISTENCE + "oldLvl");
-        oldExp = config.getInt(PREFIX_STATE_PERSISTENCE + "oldExp");
-        oldHealthScale = config.getDouble(PREFIX_STATE_PERSISTENCE + "oldHealthScale");
-        oldHealth = config.getDouble(PREFIX_STATE_PERSISTENCE + "oldHealth");
-        oldFoodLevel = config.getInt(PREFIX_STATE_PERSISTENCE + "oldFoodLevel");
-        oldFireTicks = config.getInt(PREFIX_STATE_PERSISTENCE + "oldFireTicks");
+            oldLvl = config.getInt(PREFIX_STATE_PERSISTENCE + "oldLvl");
+            oldExp = config.getInt(PREFIX_STATE_PERSISTENCE + "oldExp");
+            oldHealthScale = config.getDouble(PREFIX_STATE_PERSISTENCE + "oldHealthScale");
+            oldHealth = config.getDouble(PREFIX_STATE_PERSISTENCE + "oldHealth");
+            oldFoodLevel = config.getInt(PREFIX_STATE_PERSISTENCE + "oldFoodLevel");
+            oldFireTicks = config.getInt(PREFIX_STATE_PERSISTENCE + "oldFireTicks");
 
-        if (EnumUtil.isValidEnum(GameMode.class, config.getString(PREFIX_STATE_PERSISTENCE + "oldGameMode"))) {
-            oldGameMode = GameMode.valueOf(config.getString(PREFIX_STATE_PERSISTENCE + "oldGameMode"));
-        } else {
-            oldGameMode = GameMode.SURVIVAL;
-        }
-        oldPotionEffects = (Collection<PotionEffect>) config.get(PREFIX_STATE_PERSISTENCE + "oldPotionEffects");
+            if (EnumUtil.isValidEnum(GameMode.class, config.getString(PREFIX_STATE_PERSISTENCE + "oldGameMode"))) {
+                oldGameMode = GameMode.valueOf(config.getString(PREFIX_STATE_PERSISTENCE + "oldGameMode"));
+            } else {
+                oldGameMode = GameMode.SURVIVAL;
+            }
+            oldPotionEffects = (Collection<PotionEffect>) config.get(PREFIX_STATE_PERSISTENCE + "oldPotionEffects");
 
-        oldLocation = (Location) config.get(PREFIX_STATE_PERSISTENCE + "oldLocation");
-        if (oldLocation.getWorld() == null) {
-            oldLocation = plugin.getServer().getWorlds().get(0).getSpawnLocation();
+            oldLocation = (Location) config.get(PREFIX_STATE_PERSISTENCE + "oldLocation");
+            if (oldLocation.getWorld() == null) {
+                oldLocation = plugin.getServer().getWorlds().get(0).getSpawnLocation();
+            }
+
+        } catch (Exception exception) {
+            MessageUtil.log(plugin, DMessages.LOG_ERROR_BAD_CONFIG.getMessage(file.getName(), "Removing..."));
+            file.delete();
+            initialize();
         }
     }
 

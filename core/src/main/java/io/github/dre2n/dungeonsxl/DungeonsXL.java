@@ -335,7 +335,7 @@ public class DungeonsXL extends BRPlugin {
      * load / reload a new instance of MainConfig
      */
     public void loadMainConfig(File file) {
-        mainConfig = new MainConfig(file);
+        mainConfig = new MainConfig(this, file);
     }
 
     /**

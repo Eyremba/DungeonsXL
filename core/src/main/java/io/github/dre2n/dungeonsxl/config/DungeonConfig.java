@@ -17,6 +17,7 @@
 package io.github.dre2n.dungeonsxl.config;
 
 import io.github.dre2n.commons.config.BRConfig;
+import io.github.dre2n.commons.util.messageutil.MessageUtil;
 import io.github.dre2n.dungeonsxl.DungeonsXL;
 import io.github.dre2n.dungeonsxl.world.DResourceWorld;
 import io.github.dre2n.dungeonsxl.world.DWorlds;
@@ -225,37 +226,42 @@ public class DungeonConfig extends BRConfig {
 
     @Override
     public void load() {
-        if (config.contains("floors")) {
-            for (String floor : config.getStringList("floors")) {
-                DResourceWorld resource = worlds.getResourceByName(floor);
-                if (resource != null) {
-                    floors.add(resource);
+        try {
+            if (config.contains("floors")) {
+                for (String floor : config.getStringList("floors")) {
+                    DResourceWorld resource = worlds.getResourceByName(floor);
+                    if (resource != null) {
+                        floors.add(resource);
+                    }
                 }
             }
-        }
 
-        if (config.contains("startFloor")) {
-            startFloor = worlds.getResourceByName(config.getString("startFloor"));
-        }
+            if (config.contains("startFloor")) {
+                startFloor = worlds.getResourceByName(config.getString("startFloor"));
+            }
 
-        if (config.contains("endFloor")) {
-            endFloor = worlds.getResourceByName(config.getString("endFloor"));
-        }
+            if (config.contains("endFloor")) {
+                endFloor = worlds.getResourceByName(config.getString("endFloor"));
+            }
 
-        if (config.contains("floorCount")) {
-            floorCount = config.getInt("floorCount");
-        }
+            if (config.contains("floorCount")) {
+                floorCount = config.getInt("floorCount");
+            }
 
-        if (config.contains("removeWhenPlayed")) {
-            removeWhenPlayed = config.getBoolean("removeWhenPlayed");
-        }
+            if (config.contains("removeWhenPlayed")) {
+                removeWhenPlayed = config.getBoolean("removeWhenPlayed");
+            }
 
-        if (config.contains("overrideValues")) {
-            overrideValues = new WorldConfig(config.getConfigurationSection("overrideValues"));
-        }
+            if (config.contains("overrideValues")) {
+                overrideValues = new WorldConfig(config.getConfigurationSection("overrideValues"));
+            }
 
-        if (config.contains("defaultValues")) {
-            defaultValues = new WorldConfig(config.getConfigurationSection("defaultValues"));
+            if (config.contains("defaultValues")) {
+                defaultValues = new WorldConfig(config.getConfigurationSection("defaultValues"));
+            }
+
+        } catch (Exception exception) {
+            MessageUtil.log(DungeonsXL.getInstance(), DMessages.LOG_ERROR_BAD_CONFIG.getMessage(file.getName(), ""));
         }
     }
 

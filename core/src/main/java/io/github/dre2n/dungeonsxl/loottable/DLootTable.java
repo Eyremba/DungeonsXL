@@ -18,6 +18,9 @@ package io.github.dre2n.dungeonsxl.loottable;
 
 import io.github.dre2n.caliburn.item.UniversalItemStack;
 import io.github.dre2n.commons.util.NumberUtil;
+import io.github.dre2n.commons.util.messageutil.MessageUtil;
+import io.github.dre2n.dungeonsxl.DungeonsXL;
+import io.github.dre2n.dungeonsxl.config.DMessages;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,19 +115,25 @@ public class DLootTable {
     public DLootTable(String name, FileConfiguration config) {
         this.name = name;
 
-        for (String id : config.getKeys(true)) {
-            ItemStack item = null;
-            Object itemObj = config.get(id + ".item");
-            if (itemObj instanceof ItemStack) {
-                item = (ItemStack) itemObj;
-            } else if (itemObj instanceof UniversalItemStack) {
-                item = ((UniversalItemStack) itemObj).toItemStack();
-            } else if (itemObj instanceof String) {
-                item = UniversalItemStack.deserializeSimple((String) itemObj).toItemStack();
+        try {
+            for (String id : config.getKeys(true)) {
+                ItemStack item = null;
+                Object itemObj = config.get(id + ".item");
+                if (itemObj instanceof ItemStack) {
+                    item = (ItemStack) itemObj;
+                } else if (itemObj instanceof UniversalItemStack) {
+                    item = ((UniversalItemStack) itemObj).toItemStack();
+                } else if (itemObj instanceof String) {
+                    item = UniversalItemStack.deserializeSimple((String) itemObj).toItemStack();
+                }
+
+                double chance = config.getDouble(id + ".chance");
+                entries.add(new Entry(id, item, chance));
             }
 
-            double chance = config.getDouble(id + ".chance");
-            entries.add(new Entry(id, item, chance));
+        } catch (Exception exception) {
+            MessageUtil.log(DungeonsXL.getInstance(), DMessages.LOG_ERROR_BAD_CONFIG.getMessage(name + ".yml", ""));
+            entries = new ArrayList<>();
         }
     }
 

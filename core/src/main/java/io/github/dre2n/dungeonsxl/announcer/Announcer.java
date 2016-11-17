@@ -88,29 +88,34 @@ public class Announcer {
     public Announcer(String name, FileConfiguration config) {
         this.name = name;
 
-        description = config.getStringList("description");
-        worlds = config.getStringList("worlds");
+        try {
+            description = config.getStringList("description");
+            worlds = config.getStringList("worlds");
 
-        String identifier = config.getString("identifier");
-        boolean multiFloor = config.getBoolean("multiFloor");
-        if (multiFloor) {
-            dungeonName = identifier;
+            String identifier = config.getString("identifier");
+            boolean multiFloor = config.getBoolean("multiFloor");
+            if (multiFloor) {
+                dungeonName = identifier;
 
-            Dungeon dungeon = plugin.getDungeons().getByName(identifier);
-            if (dungeon != null) {
-                mapName = dungeon.getConfig().getStartFloor().getName();
+                Dungeon dungeon = plugin.getDungeons().getByName(identifier);
+                if (dungeon != null) {
+                    mapName = dungeon.getConfig().getStartFloor().getName();
+                }
+
+            } else {
+                mapName = identifier;
             }
 
-        } else {
-            mapName = identifier;
+            minGroupsPerGame = config.getInt("minGroupsPerGame");
+            minPlayersPerGroup = config.getInt("minPlayersPerGroup");
+
+            maxGroupsPerGame = (short) config.getInt("maxGroupsPerGame");
+            dGroups = new ArrayList<>(Collections.nCopies(maxGroupsPerGame + 1, (DGroup) null));
+            maxPlayersPerGroup = config.getInt("maxPlayersPerGroup");
+
+        } catch (Exception exception) {
+            MessageUtil.log(plugin, DMessages.LOG_ERROR_BAD_CONFIG.getMessage(name + ".yml", ""));
         }
-
-        minGroupsPerGame = config.getInt("minGroupsPerGame");
-        minPlayersPerGroup = config.getInt("minPlayersPerGroup");
-
-        maxGroupsPerGame = (short) config.getInt("maxGroupsPerGame");
-        dGroups = new ArrayList<>(Collections.nCopies(maxGroupsPerGame + 1, (DGroup) null));
-        maxPlayersPerGroup = config.getInt("maxPlayersPerGroup");
     }
 
     /**

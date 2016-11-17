@@ -159,6 +159,7 @@ public enum DMessages implements Messages {
     GROUP_PLAYER_JOINED("Group_PlayerJoined", "&6Player &4&v1&6 has joined the group!"),
     GROUP_WAVE_FINISHED("Group_WaveFinished", "&6Your group finished wave no. &4&v1&6. The next one is going to start in &4&v2&6 seconds."),
     LOG_DISABLED_TWEAKS("Log_DisabledTweaks", "&4Disabled performance tweaks because there is no support for this server software."),
+    LOG_ERROR_BAD_CONFIG("Log_Error_BadConfig", "&4The configuration script &6&v1 &4is erroneous! &4&v2"),
     LOG_ERROR_DUNGEON_SETUP("Log_Error_DungeonSetup", "&4The setup of dungeon &6&v1&4 is incorrect. See https://github.com/DRE2N/DungeonsXL/wiki/dungeon-configuration for reference."),
     LOG_ERROR_MOB_ENCHANTMENT("Log_Error_MobEnchantment", "&4An error occurred while loading mob.yml: Enchantment &6&v1&4 doesn't exist!"),
     LOG_ERROR_MOBTYPE("Log_Error_MobType", "&4Error at loading mob.yml: Mob &6&v1&4 doesn't exist!"),

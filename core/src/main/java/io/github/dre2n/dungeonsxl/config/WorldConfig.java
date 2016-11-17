@@ -75,195 +75,201 @@ public class WorldConfig extends GameRules {
 
     // Load & Save
     public void load(ConfigurationSection configFile) {
-        /* Messages */
-        ConfigurationSection configSectionMessages = configFile.getConfigurationSection("message");
-        if (configSectionMessages != null) {
-            Set<String> list = configSectionMessages.getKeys(false);
-            for (String messagePath : list) {
-                int messageId = NumberUtil.parseInt(messagePath);
-                setMessage(messageId, configSectionMessages.getString(messagePath));
+        try {
+            /* Messages */
+            ConfigurationSection configSectionMessages = configFile.getConfigurationSection("message");
+            if (configSectionMessages != null) {
+                Set<String> list = configSectionMessages.getKeys(false);
+                for (String messagePath : list) {
+                    int messageId = NumberUtil.parseInt(messagePath);
+                    setMessage(messageId, configSectionMessages.getString(messagePath));
+                }
             }
-        }
 
-        /* Secure Objects */
-        if (configFile.contains("secureObjects")) {
-            if (Version.andHigher(Version.MC1_9).contains(compat.getVersion())) {
-                secureObjects = UniversalItemStack.deserializeList(configFile.getList("secureObjects"));
-            } else {
-                secureObjects = DeserializationUtil.deserializeStackList(configFile.getStringList("secureObjects"));
+            /* Secure Objects */
+            if (configFile.contains("secureObjects")) {
+                if (Version.andHigher(Version.MC1_9).contains(compat.getVersion())) {
+                    secureObjects = UniversalItemStack.deserializeList(configFile.getList("secureObjects"));
+                } else {
+                    secureObjects = DeserializationUtil.deserializeStackList(configFile.getStringList("secureObjects"));
+                }
             }
-        }
 
-        /* Invited Players */
-        if (configFile.contains("invitedPlayers")) {
-            invitedPlayers = configFile.getStringList("invitedPlayers");
+            /* Invited Players */
+            if (configFile.contains("invitedPlayers")) {
+                invitedPlayers = configFile.getStringList("invitedPlayers");
 
-        }
-
-        /* Keep Inventory */
-        if (configFile.contains("keepInventory")) {
-            if (!configFile.contains("keepInventoryOnEnter")) {
-                keepInventoryOnEnter = configFile.getBoolean("keepInventory");
             }
-            if (!configFile.contains("keepInventoryOnEscape")) {
-                keepInventoryOnEscape = configFile.getBoolean("keepInventory");
+
+            /* Keep Inventory */
+            if (configFile.contains("keepInventory")) {
+                if (!configFile.contains("keepInventoryOnEnter")) {
+                    keepInventoryOnEnter = configFile.getBoolean("keepInventory");
+                }
+                if (!configFile.contains("keepInventoryOnEscape")) {
+                    keepInventoryOnEscape = configFile.getBoolean("keepInventory");
+                }
+                if (!configFile.contains("keepInventoryOnFinish")) {
+                    keepInventoryOnFinish = configFile.getBoolean("keepInventory");
+                }
             }
-            if (!configFile.contains("keepInventoryOnFinish")) {
-                keepInventoryOnFinish = configFile.getBoolean("keepInventory");
+
+            if (configFile.contains("keepInventoryOnEnter")) {
+                keepInventoryOnEnter = configFile.getBoolean("keepInventoryOnEnter");
             }
-        }
 
-        if (configFile.contains("keepInventoryOnEnter")) {
-            keepInventoryOnEnter = configFile.getBoolean("keepInventoryOnEnter");
-        }
-
-        if (configFile.contains("keepInventoryOnEscape")) {
-            keepInventoryOnEscape = configFile.getBoolean("keepInventoryOnEscape");
-        }
-
-        if (configFile.contains("keepInventoryOnFinish")) {
-            keepInventoryOnFinish = configFile.getBoolean("keepInventoryOnFinish");
-        }
-
-        if (configFile.contains("keepInventoryOnDeath")) {
-            keepInventoryOnDeath = configFile.getBoolean("keepInventoryOnDeath");
-        }
-
-        /* World interaction */
-        if (configFile.contains("gameMode")) {
-            if (EnumUtil.isValidEnum(GameMode.class, configFile.getString("gameMode").toUpperCase())) {
-                gameMode = GameMode.valueOf(configFile.getString("gameMode"));
-            } else {
-                gameMode = GameMode.getByValue(configFile.getInt("gameMode"));
+            if (configFile.contains("keepInventoryOnEscape")) {
+                keepInventoryOnEscape = configFile.getBoolean("keepInventoryOnEscape");
             }
-        }
 
-        if (configFile.contains("breakBlocks")) {
-            breakBlocks = configFile.getBoolean("breakBlocks");
-        }
+            if (configFile.contains("keepInventoryOnFinish")) {
+                keepInventoryOnFinish = configFile.getBoolean("keepInventoryOnFinish");
+            }
 
-        if (configFile.contains("breakPlacedBlocks")) {
-            breakPlacedBlocks = configFile.getBoolean("breakPlacedBlocks");
-        }
+            if (configFile.contains("keepInventoryOnDeath")) {
+                keepInventoryOnDeath = configFile.getBoolean("keepInventoryOnDeath");
+            }
 
-        if (configFile.contains("breakWhitelist")) {
-            breakWhitelist = new HashMap<>();
-            for (Entry<String, Object> entry : configFile.getConfigurationSection("breakWhitelist").getValues(true).entrySet()) {
-                Material breakable = Material.matchMaterial(entry.getKey());
+            /* World interaction */
+            if (configFile.contains("gameMode")) {
+                if (EnumUtil.isValidEnum(GameMode.class, configFile.getString("gameMode").toUpperCase())) {
+                    gameMode = GameMode.valueOf(configFile.getString("gameMode"));
+                } else {
+                    gameMode = GameMode.getByValue(configFile.getInt("gameMode"));
+                }
+            }
 
-                HashSet<Material> tools = new HashSet<>();
-                if (entry.getValue() instanceof List) {
-                    for (String materialString : (List<String>) entry.getValue()) {
-                        Material tool = Material.matchMaterial(materialString);
-                        if (tool != null) {
-                            tools.add(tool);
+            if (configFile.contains("breakBlocks")) {
+                breakBlocks = configFile.getBoolean("breakBlocks");
+            }
+
+            if (configFile.contains("breakPlacedBlocks")) {
+                breakPlacedBlocks = configFile.getBoolean("breakPlacedBlocks");
+            }
+
+            if (configFile.contains("breakWhitelist")) {
+                breakWhitelist = new HashMap<>();
+                for (Entry<String, Object> entry : configFile.getConfigurationSection("breakWhitelist").getValues(true).entrySet()) {
+                    Material breakable = Material.matchMaterial(entry.getKey());
+
+                    HashSet<Material> tools = new HashSet<>();
+                    if (entry.getValue() instanceof List) {
+                        for (String materialString : (List<String>) entry.getValue()) {
+                            Material tool = Material.matchMaterial(materialString);
+                            if (tool != null) {
+                                tools.add(tool);
+                            }
                         }
                     }
-                }
 
-                breakWhitelist.put(breakable, tools);
-            }
-        }
-
-        if (configFile.contains("placeBlocks")) {
-            placeBlocks = configFile.getBoolean("placeBlocks");
-        }
-
-        if (configFile.contains("placeWhitelist")) {
-            placeWhitelist = new HashSet<>();
-            for (String materialString : configFile.getStringList("placeWhitelist")) {
-                Material material = Material.matchMaterial(materialString);
-                if (material != null) {
-                    placeWhitelist.add(material);
+                    breakWhitelist.put(breakable, tools);
                 }
             }
-        }
 
-        /* PvP */
-        if (configFile.contains("playerVersusPlayer")) {
-            playerVersusPlayer = configFile.getBoolean("playerVersusPlayer");
-        }
-
-        /* Friendly fire */
-        if (configFile.contains("friendlyFire")) {
-            friendlyFire = configFile.getBoolean("friendlyFire");
-        }
-
-        /* Lives */
-        if (configFile.contains("initialLives")) {
-            initialLives = configFile.getInt("initialLives");
-        }
-
-        if (configFile.contains("initialGroupLives")) {
-            initialGroupLives = configFile.getInt("initialGroupLives");
-        }
-
-        /* Lobby */
-        if (configFile.contains("isLobbyDisabled")) {
-            lobbyDisabled = configFile.getBoolean("isLobbyDisabled");
-        }
-
-        /* Times */
-        if (configFile.contains("timeToNextPlay")) {
-            timeToNextPlay = configFile.getInt("timeToNextPlay");
-        }
-
-        if (configFile.contains("timeToNextLoot")) {
-            timeToNextLoot = configFile.getInt("timeToNextLoot");
-        }
-
-        if (configFile.contains("timeToNextWave")) {
-            timeToNextWave = configFile.getInt("timeToNextWave");
-        }
-
-        if (configFile.contains("timeUntilKickOfflinePlayer")) {
-            timeUntilKickOfflinePlayer = configFile.getInt("timeUntilKickOfflinePlayer");
-        }
-
-        if (configFile.contains("timeToFinish")) {
-            timeToFinish = configFile.getInt("timeToFinish");
-        }
-
-        /* Dungeon Requirements */
-        if (configFile.contains("requirements")) {
-            if (requirements == null) {
-                requirements = new ArrayList<>();
+            if (configFile.contains("placeBlocks")) {
+                placeBlocks = configFile.getBoolean("placeBlocks");
             }
 
-            ConfigurationSection requirementSection = configFile.getConfigurationSection("requirements");
-            for (String identifier : configFile.getConfigurationSection("requirements").getKeys(false)) {
-                Requirement requirement = Requirement.create(plugin.getRequirementTypes().getByIdentifier(identifier));
-                requirement.setup(requirementSection);
-                requirements.add(requirement);
+            if (configFile.contains("placeWhitelist")) {
+                placeWhitelist = new HashSet<>();
+                for (String materialString : configFile.getStringList("placeWhitelist")) {
+                    Material material = Material.matchMaterial(materialString);
+                    if (material != null) {
+                        placeWhitelist.add(material);
+                    }
+                }
             }
-        }
 
-        if (configFile.contains("mustFinishOne")) {
-            finishedOne = configFile.getStringList("mustFinishOne");
-        } else {
-            finishedOne = new ArrayList<>();
-        }
+            /* PvP */
+            if (configFile.contains("playerVersusPlayer")) {
+                playerVersusPlayer = configFile.getBoolean("playerVersusPlayer");
+            }
 
-        if (configFile.contains("mustFinishAll")) {
-            finishedAll = configFile.getStringList("mustFinishAll");
-        } else {
-            finishedAll = new ArrayList<>();
-        }
+            /* Friendly fire */
+            if (configFile.contains("friendlyFire")) {
+                friendlyFire = configFile.getBoolean("friendlyFire");
+            }
 
-        if (configFile.contains("timeLastPlayed")) {
-            timeLastPlayed = configFile.getInt("timeLastPlayed");
-        }
+            /* Lives */
+            if (configFile.contains("initialLives")) {
+                initialLives = configFile.getInt("initialLives");
+            }
 
-        if (configFile.contains("gameCommandWhitelist")) {
-            gameCommandWhitelist = configFile.getStringList("gameCommandWhitelist");
-        }
+            if (configFile.contains("initialGroupLives")) {
+                initialGroupLives = configFile.getInt("initialGroupLives");
+            }
 
-        if (configFile.contains("gamePermissions")) {
-            gamePermissions = configFile.getStringList("gamePermissions");
-        }
+            /* Lobby */
+            if (configFile.contains("isLobbyDisabled")) {
+                lobbyDisabled = configFile.getBoolean("isLobbyDisabled");
+            }
 
-        if (configFile.contains("forcedGameType")) {
-            forcedGameType = plugin.getGameTypes().getByName(configFile.getString("forcedGameType"));
+            /* Times */
+            if (configFile.contains("timeToNextPlay")) {
+                timeToNextPlay = configFile.getInt("timeToNextPlay");
+            }
+
+            if (configFile.contains("timeToNextLoot")) {
+                timeToNextLoot = configFile.getInt("timeToNextLoot");
+            }
+
+            if (configFile.contains("timeToNextWave")) {
+                timeToNextWave = configFile.getInt("timeToNextWave");
+            }
+
+            if (configFile.contains("timeUntilKickOfflinePlayer")) {
+                timeUntilKickOfflinePlayer = configFile.getInt("timeUntilKickOfflinePlayer");
+            }
+
+            if (configFile.contains("timeToFinish")) {
+                timeToFinish = configFile.getInt("timeToFinish");
+            }
+
+            /* Dungeon Requirements */
+            if (configFile.contains("requirements")) {
+                if (requirements == null) {
+                    requirements = new ArrayList<>();
+                }
+
+                ConfigurationSection requirementSection = configFile.getConfigurationSection("requirements");
+                for (String identifier : configFile.getConfigurationSection("requirements").getKeys(false)) {
+                    Requirement requirement = Requirement.create(plugin.getRequirementTypes().getByIdentifier(identifier));
+                    requirement.setup(requirementSection);
+                    requirements.add(requirement);
+                }
+            }
+
+            if (configFile.contains("mustFinishOne")) {
+                finishedOne = configFile.getStringList("mustFinishOne");
+            } else {
+                finishedOne = new ArrayList<>();
+            }
+
+            if (configFile.contains("mustFinishAll")) {
+                finishedAll = configFile.getStringList("mustFinishAll");
+            } else {
+                finishedAll = new ArrayList<>();
+            }
+
+            if (configFile.contains("timeLastPlayed")) {
+                timeLastPlayed = configFile.getInt("timeLastPlayed");
+            }
+
+            if (configFile.contains("gameCommandWhitelist")) {
+                gameCommandWhitelist = configFile.getStringList("gameCommandWhitelist");
+            }
+
+            if (configFile.contains("gamePermissions")) {
+                gamePermissions = configFile.getStringList("gamePermissions");
+            }
+
+            if (configFile.contains("forcedGameType")) {
+                forcedGameType = plugin.getGameTypes().getByName(configFile.getString("forcedGameType"));
+            }
+
+        } catch (Exception exception) {
+            DMessages.LOG_ERROR_BAD_CONFIG.getMessage(file.getName(), "DungeonsXL will use default values instead.");
+            apply(DEFAULT_VALUES);
         }
     }
 
